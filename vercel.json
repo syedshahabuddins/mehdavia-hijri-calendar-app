@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/index.js": {
+      "runtime": "vercel-nodejs"
+    }
+  },
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.js" }
+  ]
+}
