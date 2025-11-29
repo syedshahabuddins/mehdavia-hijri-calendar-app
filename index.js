@@ -1,18 +1,25 @@
 const express = require('express');
 const cors = require('cors');
+const axios = require('axios'); // For making HTTP requests
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.json({ msg: 'Hijri API running' });
-});
+app.get('/', (req, res) => res.json({ msg: 'Hijri API running' }));
 
-app.get('/timings', (req, res) => {
-  const timings = { Fajr: '04:30', Dhuhr: '12:15', Asr: '15:45', Maghrib: '18:20', Isha: '19:45' };
-  res.json(timings);
+// Fetch prayer times by city
+app.get('/timings', async (req, res) => {
+  const city = req.query.city || 'Karachi';
+  const country = req.query.country || 'Pakistan';
+  const method = req.query.method || '1'; // Calculation method
+
+  try {
+    const response = await axios.get(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=${method}`);
+    res.json(response.data.data.timings);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch prayer times' });
+  }
 });
 
 module.exports = app;
-
