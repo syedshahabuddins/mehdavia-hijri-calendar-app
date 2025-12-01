@@ -8,11 +8,20 @@
 </head>
 <body>
     <header>
-        <h1>Hijri Calendar</h1>
-        <div class="controls">
-            <button id="prevMonth">◀</button>
-            <div id="monthLabel"></div>
-            <button id="nextMonth">▶</button>
+        <div class="header-row">
+            <div class="month-left">
+                <div class="small-title">Gregorian</div>
+                <div id="monthLabelGreg" class="month-label gregorian"></div>
+            </div>
+            <div class="controls">
+                <button id="prevMonth" title="Previous month">◀</button>
+                <h1>Hijri Calendar</h1>
+                <button id="nextMonth" title="Next month">▶</button>
+            </div>
+            <div class="month-right">
+                <div class="small-title">Hijri</div>
+                <div id="monthLabelHijri" class="month-label hijri"></div>
+            </div>
         </div>
         <div class="settings">
             <label><input type="checkbox" id="useLocation"> Use location for approximate observation</label>

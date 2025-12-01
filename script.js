@@ -3,7 +3,8 @@ let gLat = null, gLon = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     const calendarDiv = document.getElementById('calendar');
-    const monthLabel = document.getElementById('monthLabel');
+    const monthLabelGreg = document.getElementById('monthLabelGreg');
+    const monthLabelHijri = document.getElementById('monthLabelHijri');
     const prevBtn = document.getElementById('prevMonth');
     const nextBtn = document.getElementById('nextMonth');
     const useLocationCheckbox = document.getElementById('useLocation');
@@ -55,7 +56,12 @@ document.addEventListener('DOMContentLoaded', function() {
     render();
 
     function render() {
-        monthLabel.textContent = `${new Date(viewYear, viewMonth, 1).toLocaleString(undefined, {month: 'long', year: 'numeric'})}`;
+        // Gregorian label (left)
+        monthLabelGreg.textContent = `${new Date(viewYear, viewMonth, 1).toLocaleString(undefined, {month: 'long', year: 'numeric'})}`;
+        // Hijri label (right) - compute Hijri for the 1st of the viewed Gregorian month
+        const repDate = new Date(viewYear, viewMonth, 1, 12, 0, 0);
+        const hij = gregorianToHijri(repDate);
+        monthLabelHijri.textContent = `${hijriMonthNames[hij.month]} ${hij.year}`;
         buildCalendar(viewYear, viewMonth);
     }
 });
@@ -228,9 +234,9 @@ function buildCalendar(year, monthIndex) {
         }
 
         const isToday = (dateObj.toDateString() === new Date().toDateString());
-        html += `<div class="day-cell"${isToday ? ' style="outline: 2px solid #4a90e2"' : ''}>
-                    <div class="day-greg">${d}</div>
+        html += `<div class="day-cell${isToday ? ' today' : ''}">
                     <div class="day-hijri">${hijri.day} ${hijriMonthNames[hijri.month]} ${hijri.year}</div>
+                    <div class="day-greg">${d}</div>
                 </div>`;
     }
 

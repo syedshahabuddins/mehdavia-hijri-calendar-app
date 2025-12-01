@@ -24,20 +24,60 @@ header {
     padding: 16px 12px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
+.header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.month-left, .month-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.month-right {
+    align-items: flex-end;
+}
+.small-title {
+    font-size: 0.78rem;
+    color: #777;
+}
+.month-label {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #222;
+}
+.month-label.hijri {
+    color: #b44bff; /* accent for Hijri */
+    font-size: 1.15rem;
+}
 .controls {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    margin-top: 8px;
+    gap: 16px;
 }
-#monthLabel {
-    font-weight: 600;
+.controls h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #333;
 }
+.controls button {
+    background: linear-gradient(180deg,#fff,#f3f3f8);
+    border: 1px solid #e0e0e8;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+.controls button:hover { transform: translateY(-1px); }
 .settings {
-    margin-top: 8px;
+    margin-top: 10px;
     font-size: 0.95rem;
     color: #444;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
 }
 main {
     padding: 18px;
@@ -48,23 +88,33 @@ main {
     gap: 6px;
 }
 .day-cell {
-    min-height: 80px;
-    border-radius: 6px;
-    padding: 8px;
-    background: #fafafa;
+    min-height: 90px;
+    border-radius: 10px;
+    padding: 10px;
+    background: linear-gradient(180deg,#ffffff,#fbf8ff);
     border: 1px solid #eee;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    transition: transform .12s ease, box-shadow .12s ease;
 }
+.day-cell:hover { transform: translateY(-4px); box-shadow: 0 6px 18px rgba(120,80,180,0.06); }
 .day-greg {
-    font-weight: 600;
-    color: #222;
+    font-weight: 500;
+    color: #666;
+    font-size: 0.9rem;
 }
 .day-hijri {
     margin-top: 6px;
-    font-size: 0.9rem;
-    color: #666;
+    font-size: 1.05rem;
+    color: #4a1aa6;
+    font-weight: 700;
+}
+.weekday {
+    font-weight: 700;
+    color: #555;
+    padding: 6px 0;
+    text-align: center;
 }
 .weekday {
     font-weight: 700;
@@ -75,6 +125,10 @@ main {
     margin-top: 14px;
     color: #333;
     font-size: 0.95rem;
+}
+
+.day-cell.today {
+    outline: 3px solid rgba(74,144,226,0.18);
 }
 
 @media (max-width: 700px) {
