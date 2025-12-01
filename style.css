@@ -18,3 +18,66 @@ h1 {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
+header {
+    background: #fff;
+    padding: 16px 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+#monthLabel {
+    font-weight: 600;
+}
+.settings {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: #444;
+}
+main {
+    padding: 18px;
+}
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+.day-cell {
+    min-height: 80px;
+    border-radius: 6px;
+    padding: 8px;
+    background: #fafafa;
+    border: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.day-greg {
+    font-weight: 600;
+    color: #222;
+}
+.day-hijri {
+    margin-top: 6px;
+    font-size: 0.9rem;
+    color: #666;
+}
+.weekday {
+    font-weight: 700;
+    color: #555;
+    padding: 6px 0;
+}
+#info {
+    margin-top: 14px;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 700px) {
+    #calendar { width: 96%; }
+    .day-cell { min-height: 72px; }
+}

@@ -4,11 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hijri Calendar</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Hijri Calendar</h1>
-    <div id="calendar"></div>
+    <header>
+        <h1>Hijri Calendar</h1>
+        <div class="controls">
+            <button id="prevMonth">◀</button>
+            <div id="monthLabel"></div>
+            <button id="nextMonth">▶</button>
+        </div>
+        <div class="settings">
+            <label><input type="checkbox" id="useLocation"> Use location for approximate observation</label>
+            <label><input type="checkbox" id="adjustByMoon"> Adjust by moon age at local sunset</label>
+        </div>
+    </header>
+
+    <main>
+        <div id="calendar"></div>
+        <div id="info"></div>
+    </main>
+
     <script src="script.js"></script>
 </body>
 </html>
