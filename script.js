@@ -55,6 +55,53 @@ document.addEventListener('DOMContentLoaded', function() {
 
     render();
 
+    // Settings toggle for small screens
+    const toggleSettingsBtn = document.getElementById('toggleSettings');
+    const settingsDiv = document.getElementById('settings');
+    if (toggleSettingsBtn && settingsDiv) {
+        toggleSettingsBtn.addEventListener('click', () => {
+            const expanded = toggleSettingsBtn.getAttribute('aria-expanded') === 'true';
+            toggleSettingsBtn.setAttribute('aria-expanded', String(!expanded));
+            const visible = !expanded;
+            settingsDiv.style.display = visible ? 'flex' : 'none';
+            settingsDiv.setAttribute('aria-hidden', String(!visible));
+        });
+        // keep settings hidden by default on small screens
+        settingsDiv.style.display = window.innerWidth <= 700 ? 'none' : 'flex';
+    }
+
+    // Touch / swipe support for month navigation
+    let touchStartX = null;
+    let touchStartY = null;
+    const touchThreshold = 40; // px
+    calendarDiv.addEventListener('touchstart', (e) => {
+        const t = e.touches[0];
+        touchStartX = t.clientX;
+        touchStartY = t.clientY;
+    }, {passive:true});
+    calendarDiv.addEventListener('touchend', (e) => {
+        if (touchStartX === null) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - touchStartX;
+        const dy = t.clientY - touchStartY;
+        // ignore mostly-vertical swipes
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > touchThreshold) {
+            if (dx < 0) { // swipe left -> next
+                nextBtn.click();
+            } else { // swipe right -> prev
+                prevBtn.click();
+            }
+        }
+        touchStartX = null;
+        touchStartY = null;
+    }, {passive:true});
+
+    // Keyboard left/right navigation when calendar focused
+    calendarDiv.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); prevBtn.click(); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); nextBtn.click(); }
+    });
+
     function render() {
         // Gregorian label (left)
         monthLabelGreg.textContent = `${new Date(viewYear, viewMonth, 1).toLocaleString(undefined, {month: 'long', year: 'numeric'})}`;
@@ -234,9 +281,13 @@ function buildCalendar(year, monthIndex) {
         }
 
         const isToday = (dateObj.toDateString() === new Date().toDateString());
-        html += `<div class="day-cell${isToday ? ' today' : ''}">
-                    <div class="day-hijri">${hijri.day} ${hijriMonthNames[hijri.month]} ${hijri.year}</div>
-                    <div class="day-greg">${d}</div>
+        // Make day cells focusable for keyboard users and improved reading order on small screens
+        html += `<div class="day-cell${isToday ? ' today' : ''}" tabindex="0" role="button" aria-label="${d} ${new Date(year, monthIndex, d).toLocaleString(undefined,{month:'long'})}, Hijri ${hijri.day} ${hijriMonthNames[hijri.month]} ${hijri.year}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+                        <div class="day-greg">${d}</div>
+                        <div class="small-title" style="color:#999;font-size:0.86rem">${new Date(year, monthIndex, d).toLocaleString(undefined,{weekday:'short'})}</div>
+                    </div>
+                    <div class="day-hijri">${hijri.day} ${hijriMonthNames[hijri.month]}</div>
                 </div>`;
     }
 

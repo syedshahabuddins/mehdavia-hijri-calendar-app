@@ -1,137 +1,84 @@
+:root{
+    --bg:#f7f7fb;
+    --card:#ffffff;
+    --muted:#6b6b7a;
+    --accent:#6b21c8; /* deep violet accent */
+    --accent-2:#4a1aa6;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
     text-align: center;
     margin: 0;
     padding: 0;
-    background-color: #f0f0f0;
-}
-
-h1 {
-    color: #333;
-}
-
-#calendar {
-    margin: 20px auto;
-    width: 80%;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-header {
-    background: #fff;
-    padding: 16px 12px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-}
-.header-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-.month-left, .month-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-.month-right {
-    align-items: flex-end;
-}
-.small-title {
-    font-size: 0.78rem;
-    color: #777;
-}
-.month-label {
-    font-weight: 700;
-    font-size: 1.05rem;
+    background-color: var(--bg);
     color: #222;
-}
-.month-label.hijri {
-    color: #b44bff; /* accent for Hijri */
-    font-size: 1.15rem;
-}
-.controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-}
-.controls h1 {
-    margin: 0;
-    font-size: 1.25rem;
-    color: #333;
-}
-.controls button {
-    background: linear-gradient(180deg,#fff,#f3f3f8);
-    border: 1px solid #e0e0e8;
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-}
-.controls button:hover { transform: translateY(-1px); }
-.settings {
-    margin-top: 10px;
-    font-size: 0.95rem;
-    color: #444;
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-}
-main {
-    padding: 18px;
-}
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-}
-.day-cell {
-    min-height: 90px;
-    border-radius: 10px;
-    padding: 10px;
-    background: linear-gradient(180deg,#ffffff,#fbf8ff);
-    border: 1px solid #eee;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    transition: transform .12s ease, box-shadow .12s ease;
-}
-.day-cell:hover { transform: translateY(-4px); box-shadow: 0 6px 18px rgba(120,80,180,0.06); }
-.day-greg {
-    font-weight: 500;
-    color: #666;
-    font-size: 0.9rem;
-}
-.day-hijri {
-    margin-top: 6px;
-    font-size: 1.05rem;
-    color: #4a1aa6;
-    font-weight: 700;
-}
-.weekday {
-    font-weight: 700;
-    color: #555;
-    padding: 6px 0;
-    text-align: center;
-}
-.weekday {
-    font-weight: 700;
-    color: #555;
-    padding: 6px 0;
-}
-#info {
-    margin-top: 14px;
-    color: #333;
-    font-size: 0.95rem;
+    -webkit-font-smoothing:antialiased;
 }
 
-.day-cell.today {
-    outline: 3px solid rgba(74,144,226,0.18);
+h1 { color: #222; font-weight: 600; margin: 0; }
+
+#calendar { width: 100%; background: var(--card); padding: 14px; border-radius: 12px; box-shadow: 0 6px 18px rgba(60,40,90,0.06); max-width:900px; margin: 18px auto; }
+
+header { background: transparent; padding: 14px 12px 6px; }
+.header-row { display: flex; gap:12px; align-items:center; justify-content:space-between; max-width:1100px; margin: 0 auto; }
+.month-left, .month-right { display:flex; flex-direction:column; }
+.month-right { align-items:flex-end; }
+.small-title { font-size: 0.78rem; color: var(--muted); }
+.month-label { font-weight:700; font-size:1.05rem; color:#222; }
+.month-label.hijri { color: var(--accent-2); font-size:1.1rem; }
+
+.controls { display:flex; align-items:center; gap:14px; justify-content:center; }
+.controls h1 { font-size:1.05rem; }
+.controls button { background: linear-gradient(180deg,#fff,#f6f4ff); border:1px solid #ece7ff; padding:10px 12px; border-radius:10px; cursor:pointer; box-shadow:0 3px 8px rgba(80,40,120,0.06); font-weight:600; }
+.controls button:active { transform: translateY(1px); }
+
+.settings-row { display:flex; gap:12px; align-items:center; justify-content:center; max-width:1100px; margin:8px auto 0; }
+.settings { display:flex; gap:12px; align-items:center; font-size:0.95rem; color:var(--muted); }
+.settings-toggle { background:none; border:1px dashed #ddd; padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600; }
+
+main { padding: 8px 12px 24px; }
+.calendar-wrap { max-width:1100px; margin: 0 auto; }
+
+.calendar-grid { display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; align-items:start; }
+.weekday { font-weight:700; color:var(--muted); padding:8px 6px; text-align:center; border-radius:8px; background:transparent; }
+
+.day-cell { min-height:92px; border-radius:10px; padding:10px; background: linear-gradient(180deg,#ffffff,#fbf8ff); border:1px solid #f0ecfa; display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; transition:transform .12s ease, box-shadow .12s ease; }
+.day-cell:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(90,50,150,0.07); }
+.day-cell:focus { outline: 3px solid rgba(107,33,200,0.14); }
+
+.day-greg { font-weight:700; color:#222; font-size:1.05rem; }
+.day-hijri { margin-top:6px; font-size:0.95rem; color:var(--accent-2); font-weight:800; }
+
+#info { margin-top:14px; color:#333; font-size:0.95rem; }
+
+.day-cell.today { box-shadow:0 8px 26px rgba(74,144,226,0.08); border:1px solid rgba(74,144,226,0.12); }
+
+/* Responsive tweaks */
+@media (max-width: 900px) {
+    .header-row { gap:8px; }
+    .controls h1 { font-size:1rem; }
+    .day-cell { min-height:82px; padding:10px; }
 }
 
 @media (max-width: 700px) {
-    #calendar { width: 96%; }
-    .day-cell { min-height: 72px; }
+    .header-row { flex-wrap:wrap; align-items:center; gap:6px; }
+    .month-left, .month-right { width: 48%; }
+    .controls { order:3; width:100%; justify-content:space-between; padding:6px 6px; }
+    .settings { display:none; }
+    .settings[aria-hidden="false"] { display:flex; }
+    .settings-toggle { display:inline-flex; }
+    #calendar { padding:10px; }
+    .calendar-grid { gap:6px; }
+    .day-cell { min-height:70px; padding:8px; border-radius:8px; }
+    .day-greg { font-size:1rem; }
+    .day-hijri { font-size:0.92rem; }
+}
+
+@media (max-width:420px) {
+    .month-left, .month-right { width:100%; text-align:center; }
+    .month-right { align-items:center; }
+    .controls { gap:8px; }
+    .controls button { padding:10px; border-radius:12px; }
+    .weekday { font-size:0.78rem; padding:6px 2px; }
 }
