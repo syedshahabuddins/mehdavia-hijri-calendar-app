@@ -1,3 +1,6 @@
+// Global location variables (set when user allows geolocation)
+let gLat = null, gLon = null;
+
 document.addEventListener('DOMContentLoaded', function() {
     const calendarDiv = document.getElementById('calendar');
     const monthLabel = document.getElementById('monthLabel');
@@ -11,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let viewYear = today.getFullYear();
     let viewMonth = today.getMonth();
     let locationEnabled = false;
-    let lat = null, lon = null;
+    // lat/lon will be stored in globals gLat/gLon
 
     function updateInfo(msg) {
         infoDiv.textContent = msg;
@@ -27,10 +30,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             updateInfo('Requesting location...');
             navigator.geolocation.getCurrentPosition((pos) => {
-                lat = pos.coords.latitude;
-                lon = pos.coords.longitude;
+                gLat = pos.coords.latitude;
+                gLon = pos.coords.longitude;
                 locationEnabled = true;
-                updateInfo(`Location set: ${lat.toFixed(4)}, ${lon.toFixed(4)}.`);
+                updateInfo(`Location set: ${gLat.toFixed(4)}, ${gLon.toFixed(4)}.`);
                 render();
             }, (err) => {
                 updateInfo('Location permission denied or unavailable.');
@@ -103,6 +106,81 @@ function moonAge(jd) {
     return age;
 }
 
+// ---------- Sunset Calculation (NOAA algorithm, approximate) ----------
+
+function deg2rad(d) { return d * Math.PI / 180; }
+function rad2deg(r) { return r * 180 / Math.PI; }
+
+function dayOfYear(date) {
+    const start = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+    const diff = date.getTime() - start.getTime();
+    return Math.floor(diff / 86400000) + 1;
+}
+
+function fixAngle(a) {
+    a = a % 360;
+    if (a < 0) a += 360;
+    return a;
+}
+
+function calcSunsetUTC(date, lat, lon) {
+    // Returns UTC time (in hours) of sunset for the given date and location
+    // Based on NOAA algorithm: https://gml.noaa.gov/grad/solcalc/solareqns.PDF
+    const zenith = 90.833; // official
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth();
+    const day = date.getUTCDate();
+    // Day of year
+    const N = dayOfYear(date);
+    const lngHour = lon / 15;
+    // approximate time
+    const t = N + ((18 - lngHour) / 24);
+    // Sun's mean anomaly
+    const M = (0.9856 * t) - 3.289;
+    // Sun's true longitude
+    let L = M + (1.916 * Math.sin(deg2rad(M))) + (0.020 * Math.sin(deg2rad(2*M))) + 282.634;
+    L = fixAngle(L);
+    // Right ascension
+    let RA = rad2deg(Math.atan2(0.91764 * Math.sin(deg2rad(L)), Math.cos(deg2rad(L))));
+    RA = fixAngle(RA);
+    // RA needs to be in the same quadrant as L
+    const Lquadrant  = Math.floor(L/90) * 90;
+    const RAquadrant = Math.floor(RA/90) * 90;
+    RA = RA + (Lquadrant - RAquadrant);
+    RA = RA / 15; // convert to hours
+    // Sun declination
+    const sinDec = 0.39782 * Math.sin(deg2rad(L));
+    const cosDec = Math.cos(Math.asin(sinDec));
+    // Sun local hour angle
+    const cosH = (Math.cos(deg2rad(zenith)) - (sinDec * Math.sin(deg2rad(lat)))) / (cosDec * Math.cos(deg2rad(lat)));
+    if (cosH > 1) return null; // sun never sets
+    if (cosH < -1) return null; // sun never rises
+    let H = rad2deg(Math.acos(cosH)); // in degrees
+    // for sunset
+    H = H / 15; // in hours
+    // local mean time of setting
+    const T = H + RA - (0.06571 * t) - 6.622;
+    // UT time
+    let UT = T - lngHour;
+    // normalize UT to 0-24
+    UT = UT % 24;
+    if (UT < 0) UT += 24;
+    return UT; // hours in UTC
+}
+
+function calcSunsetDateUTC(date, lat, lon) {
+    // date is JS Date (will use its UTC year/month/day)
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth();
+    const day = date.getUTCDate();
+    const utHours = calcSunsetUTC(date, lat, lon);
+    if (utHours === null) return null;
+    const hour = Math.floor(utHours);
+    const minute = Math.floor((utHours - hour) * 60);
+    const second = Math.floor(((utHours - hour)*60 - minute) * 60);
+    return new Date(Date.UTC(year, month, day, hour, minute, second));
+}
+
 // ---------- Calendar Rendering ----------
 
 function buildCalendar(year, monthIndex) {
@@ -127,15 +205,24 @@ function buildCalendar(year, monthIndex) {
         const dateObj = new Date(year, monthIndex, d, 12, 0, 0); // midday local
         let hijri = gregorianToHijri(dateObj);
 
-        // Optionally adjust by moon age at local sunset (very approximate)
+        // Optionally adjust by moon age at local sunset
         if (adjustByMoon) {
-            // approximate local sunset time by 18:00 local time (simplified)
-            const sunsetLocal = new Date(year, monthIndex, d, 18, 0, 0);
-            const jdSunset = toJulianDay(new Date(sunsetLocal.getTime() - (sunsetLocal.getTimezoneOffset()*60000)));
+            let jdSunset = null;
+            if (useLocation && gLat !== null && gLon !== null) {
+                const dateForCalc = new Date(Date.UTC(year, monthIndex, d));
+                const sunsetUTC = calcSunsetDateUTC(dateForCalc, gLat, gLon);
+                if (sunsetUTC) {
+                    jdSunset = toJulianDay(sunsetUTC);
+                }
+            }
+            if (!jdSunset) {
+                // fallback: use 18:00 local time converted to UTC
+                const sunsetLocal = new Date(year, monthIndex, d, 18, 0, 0);
+                jdSunset = toJulianDay(new Date(sunsetLocal.getTime() - (sunsetLocal.getTimezoneOffset()*60000)));
+            }
             const age = moonAge(jdSunset);
             // If moon age at sunset is less than 1 day, treat this day as Hijri day 1 (approximate observational rule)
             if (age < 1.0) {
-                // Override: set day to 1 (approx). Keep month/year from computed value.
                 hijri.day = 1;
             }
         }
